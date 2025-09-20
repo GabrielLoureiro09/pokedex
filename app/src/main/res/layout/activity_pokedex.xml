@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Pokedex">
+
+    <ImageView
+        android:id="@+id/pokedex_icon"
+        android:layout_width="292dp"
+        android:layout_height="293dp"
+        android:layout_marginStart="232dp"
+        android:layout_marginTop="-54dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@mipmap/pokeball_icon" />
+
+    <TextView
+        android:id="@+id/pokedex_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="53dp"
+        android:layout_marginTop="115dp"
+        android:fontFamily="@font/jersey20"
+        android:text="Pokedex"
+        android:textColor="#000000"
+        android:textSize="48dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/search_input"
+        android:layout_width="300dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="36dp"
+        android:alpha="0.65"
+        android:background="@drawable/search_background"
+        android:fontFamily="@font/jersey20"
+        android:hint="Search"
+        android:inputType="text"
+        android:paddingStart="20dp"
+        android:singleLine="true"
+        android:textColorHint="@color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/pokemonRecyclerView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="28dp"
+        android:layout_marginTop="75dp"
+        android:layout_marginEnd="28dp"
+        android:clipToPadding="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/pokedex_title"
+        app:layout_constraintVertical_bias="0.0"
+        tools:listitem="@layout/item_pokemon_card" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
