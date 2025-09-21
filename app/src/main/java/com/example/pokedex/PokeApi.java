@@ -6,7 +6,7 @@ import retrofit2.http.Path;
 
 public interface PokeApi {
 
-    @GET("pokemon?limit=151")
+    @GET("pokemon?limit=10000")
     Call<PokemonListResponse> getPokemonList();
 
     @GET("pokemon/{id}")

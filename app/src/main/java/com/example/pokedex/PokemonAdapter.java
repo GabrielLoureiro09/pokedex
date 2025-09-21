@@ -56,28 +56,33 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
     public void onBindViewHolder(@NonNull PokemonViewHolder holder, int position) {
         Map<String, Object> pokemon = pokemonList.get(position);
 
-        // Nome e ID
         holder.name.setText((String) pokemon.get("name"));
         holder.id.setText((String) pokemon.get("id"));
 
-        // Imagem do Pokémon
         String imageUrl = (String) pokemon.get("imageUrl");
         Glide.with(context)
                 .load(imageUrl)
                 .into(holder.img);
 
-        // Tipos
         List<String> types = (List<String>) pokemon.get("types");
-        if(types.size() > 0){
+        holder.type1.setImageDrawable(null);
+        holder.type2.setImageDrawable(null);
+
+        if(!types.isEmpty()){
             String typeUrl = getTypeUrl(types.get(0));
             Glide.with(context).load(typeUrl).into(holder.type1);
         }
+
         if(types.size() > 1){
             String typeUrl = getTypeUrl(types.get(1));
             Glide.with(context).load(typeUrl).into(holder.type2);
         }
 
+
         String color = TYPE_COLORS.getOrDefault(types.get(0), "#FFFFFF");
+        if(types.get(0) == "fairy"){
+
+        }
         holder.cardView.setCardBackgroundColor(Color.parseColor(color));
     }
 
@@ -86,7 +91,6 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
         return pokemonList.size();
     }
 
-    // Função para pegar ícone do tipo (black-white)
     private String getTypeUrl(String typeName){
         return "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/types/generation-v/black-white/"
                 + getTypeId(typeName) + ".png";
@@ -94,7 +98,9 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
 
     private int getTypeId(String typeName){
         switch(typeName.toLowerCase()){
-            case "normal": return 1;
+            case "normal":
+            case "fairy":
+                return 1;
             case "fighting": return 2;
             case "flying": return 3;
             case "poison": return 4;
@@ -111,7 +117,6 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
             case "ice": return 15;
             case "dragon": return 16;
             case "dark": return 17;
-            case "fairy": return 18;
             case "unknown": return 10001;
             case "shadow": return 10002;
             default: return 0;
@@ -135,7 +140,7 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
         put("steel", "#B7B7CE");
         put("ice", "#96D9D6");
         put("bug", "#A6B91A");
-        put("fairy", "#D685AD");
+        put("fairy", "#A8A77A");
     }};
 
 }

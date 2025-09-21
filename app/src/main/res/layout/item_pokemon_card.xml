@@ -7,14 +7,18 @@
     android:layout_height="wrap_content"
     android:layout_margin="12dp"
     app:cardBackgroundColor="#7AC74C"
-    app:cardCornerRadius="10dp">
+    app:cardCornerRadius="10dp"
+    android:clipChildren="false"
+    android:clipToPadding="false">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="165dp"
         android:layout_height="129dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        android:clipChildren="false"
+        android:clipToPadding="false">
 
         <TextView
             android:id="@+id/pokemon_name"
@@ -65,9 +69,10 @@
 
         <ImageView
             android:id="@+id/pokemon_img"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_marginTop="33dp"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="-10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:srcCompat="@tools:sample/avatars" />
