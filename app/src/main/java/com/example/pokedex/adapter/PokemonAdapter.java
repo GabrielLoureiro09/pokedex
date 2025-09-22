@@ -1,4 +1,4 @@
-package com.example.pokedex;
+package com.example.pokedex.adapter;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -13,6 +13,7 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.pokedex.R;
 
 import java.util.HashMap;
 import java.util.List;

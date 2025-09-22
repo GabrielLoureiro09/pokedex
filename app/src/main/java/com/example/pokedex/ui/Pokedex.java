@@ -1,4 +1,4 @@
-package com.example.pokedex;
+package com.example.pokedex.ui;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -6,6 +6,13 @@ import android.util.Log;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.pokedex.PokeApiClient;
+import com.example.pokedex.data.model.PokemonListResponse;
+import com.example.pokedex.data.model.PokemonResponse;
+import com.example.pokedex.R;
+import com.example.pokedex.adapter.PokemonAdapter;
+import com.example.pokedex.data.api.PokeApi;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,7 +44,7 @@ public class Pokedex extends AppCompatActivity {
         adapter = new PokemonAdapter(this, pokemonList);
         recyclerView.setAdapter(adapter);
 
-        pokeApi = ApiClient.getInstance().create(PokeApi.class);
+        pokeApi = PokeApiClient.getInstance().create(PokeApi.class);
 
         fetchPokemonList();
     }

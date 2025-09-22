@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Pokedex">
+    tools:context=".ui.Pokedex">
 
     <ImageView
         android:id="@+id/pokedex_icon"
