@@ -1,36 +1,39 @@
 package com.example.pokedex.ui;
 
 import android.os.Bundle;
-import android.util.Log;
-
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.widget.EditText;
+import android.widget.Toast;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.example.pokedex.PokeApiClient;
-import com.example.pokedex.data.model.PokemonListResponse;
-import com.example.pokedex.data.model.PokemonResponse;
 import com.example.pokedex.R;
 import com.example.pokedex.adapter.PokemonAdapter;
 import com.example.pokedex.data.api.PokeApi;
-
+import com.example.pokedex.data.model.Pokemon;
+import com.example.pokedex.data.model.PokemonModel;
+import com.example.pokedex.data.model.PokemonResponse;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-
+import java.util.Locale;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class Pokedex extends AppCompatActivity {
 
     private RecyclerView recyclerView;
-    private PokemonAdapter adapter;
-    private List<Map<String, Object>> pokemonList;
+    private PokemonAdapter pokemonAdapter;
+    private EditText searchInput;
+    private PokeApi pokeApiService;
 
-    private PokeApi pokeApi;
+    private final List<PokemonModel> initialPokemonDetails = new ArrayList<>();
+    private int detailsFetchedCounter = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,89 +41,107 @@ public class Pokedex extends AppCompatActivity {
         setContentView(R.layout.activity_pokedex);
 
         recyclerView = findViewById(R.id.pokemonRecyclerView);
+        searchInput = findViewById(R.id.search_input);
+
+        setupRetrofit();
+        pokemonAdapter = new PokemonAdapter(this);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+        recyclerView.setAdapter(pokemonAdapter);
 
-        pokemonList = new ArrayList<>();
-        adapter = new PokemonAdapter(this, pokemonList);
-        recyclerView.setAdapter(adapter);
-
-        pokeApi = PokeApiClient.getInstance().create(PokeApi.class);
-
-        fetchPokemonList();
+        setupSearchView();
+        fetchInitialPokemonData();
     }
 
-    private void fetchPokemonList() {
-        Call<PokemonListResponse> call = pokeApi.getPokemonList();
-        call.enqueue(new Callback<PokemonListResponse>() {
-            @Override
-            public void onResponse(Call<PokemonListResponse> call, Response<PokemonListResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    List<PokemonListResponse.Result> results = response.body().results;
-                    for (PokemonListResponse.Result item : results) {
-                        String[] urlParts = item.url.split("/");
-                        int id = Integer.parseInt(urlParts[urlParts.length - 1].isEmpty() ?
-                                urlParts[urlParts.length - 2] : urlParts[urlParts.length - 1]);
+    private void setupRetrofit() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://pokeapi.co/api/v2/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        pokeApiService = retrofit.create(PokeApi.class);
+    }
 
-                        fetchPokemonDetails(id);
+    private void fetchInitialPokemonData() {
+        pokeApiService.getPokemonList(151).enqueue(new Callback<PokemonResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<PokemonResponse> call, @NonNull Response<PokemonResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<Pokemon> pokemonNameList = response.body().getResults();
+                    initialPokemonDetails.clear();
+                    detailsFetchedCounter = 0;
+                    for (Pokemon pokemon : pokemonNameList) {
+                        fetchDetailsForPokemon(pokemon, pokemonNameList.size());
                     }
+                } else {
+                    Toast.makeText(Pokedex.this, "Falha ao buscar dados", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
-            public void onFailure(Call<PokemonListResponse> call, Throwable t) {
-                Log.e("Pokedex", "Erro ao carregar lista de Pokémon", t);
+            public void onFailure(@NonNull Call<PokemonResponse> call, @NonNull Throwable t) {
+                Toast.makeText(Pokedex.this, "Falha ao buscar dados", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private void fetchPokemonDetails(int id) {
-        Call<PokemonResponse> call = pokeApi.getPokemon(id);
-        call.enqueue(new Callback<PokemonResponse>() {
+    private void fetchDetailsForPokemon(Pokemon pokemon, int totalToFetch) {
+        String idOrName = pokemon.getUrl().split("/")[6];
+        pokeApiService.getPokemonDetail(idOrName).enqueue(new Callback<PokemonModel>() {
             @Override
-            public void onResponse(Call<PokemonResponse> call, Response<PokemonResponse> response) {
+            public void onResponse(@NonNull Call<PokemonModel> call, @NonNull Response<PokemonModel> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    PokemonResponse p = response.body();
-
-                    String formattedId = String.format("#%03d", p.id);
-
-                    List<PokemonResponse.TypeSlot> sortedTypes = new ArrayList<>(p.types);
-                    sortedTypes.sort((a, b) -> a.slot - b.slot);
-
-                    List<String> types = new ArrayList<>();
-                    for (PokemonResponse.TypeSlot slot : sortedTypes) {
-                        String typeName = slot.type.name.toLowerCase();
-                        if (!types.contains(typeName)) {
-                            types.add(typeName);
-                        }
-                    }
-
-                    Map<String, Object> pokemonMap = new HashMap<>();
-                    pokemonMap.put("name", capitalize(p.name));
-                    pokemonMap.put("id", formattedId);
-                    pokemonMap.put("imageUrl", p.sprites.front_default);
-                    pokemonMap.put("types", types);
-
-                    pokemonList.add(pokemonMap);
-
-                    Collections.sort(pokemonList, (p1, p2) -> {
-                        int id1 = Integer.parseInt(((String)p1.get("id")).substring(1));
-                        int id2 = Integer.parseInt(((String)p2.get("id")).substring(1));
-                        return id1 - id2;
-                    });
-
-                    adapter.notifyDataSetChanged();
+                    initialPokemonDetails.add(response.body());
+                }
+                detailsFetchedCounter++;
+                if (detailsFetchedCounter == totalToFetch) {
+                    onAllInitialDetailsFetched();
                 }
             }
 
             @Override
-            public void onFailure(Call<PokemonResponse> call, Throwable t) {
-                Log.e("Pokedex", "Erro ao carregar Pokémon " + id, t);
+            public void onFailure(@NonNull Call<PokemonModel> call, @NonNull Throwable t) {
+                detailsFetchedCounter++;
+                if (detailsFetchedCounter == totalToFetch) {
+                    onAllInitialDetailsFetched();
+                }
             }
         });
     }
 
-    private String capitalize(String str) {
-        if (str == null || str.isEmpty()) return str;
-        return str.substring(0,1).toUpperCase() + str.substring(1);
+    private void setupSearchView() {
+        searchInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                filterLocalList(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+    }
+
+    private void onAllInitialDetailsFetched() {
+        initialPokemonDetails.sort(Comparator.comparingInt(PokemonModel::getId));
+        pokemonAdapter.submitList(new ArrayList<>(initialPokemonDetails));
+    }
+
+    private void filterLocalList(String query) {
+        List<PokemonModel> filteredList = new ArrayList<>();
+        if (query.isEmpty()) {
+            filteredList.addAll(initialPokemonDetails);
+        } else {
+            for (PokemonModel pokemon : initialPokemonDetails) {
+                if (pokemon.getName().toLowerCase(Locale.ROOT).startsWith(query.toLowerCase(Locale.ROOT))) {
+                    filteredList.add(pokemon);
+                }
+            }
+        }
+        pokemonAdapter.submitList(filteredList);
     }
 }

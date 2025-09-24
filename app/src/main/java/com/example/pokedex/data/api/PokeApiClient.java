@@ -1,4 +1,4 @@
-package com.example.pokedex;
+package com.example.pokedex.data.api;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;

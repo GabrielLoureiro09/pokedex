@@ -3,22 +3,9 @@ package com.example.pokedex.data.model;
 import java.util.List;
 
 public class PokemonResponse {
-    public int id;
-    public String name;
-    public Sprites sprites;
-    public List<TypeSlot> types;
+    private List<Pokemon> results;
 
-    public static class Sprites {
-        public String front_default;
+    public List<Pokemon> getResults() {
+        return results;
     }
-
-    public static class TypeSlot {
-        public int slot;
-        public Type type;
-
-        public static class Type {
-            public String name;
-        }
-    }
-
 }
