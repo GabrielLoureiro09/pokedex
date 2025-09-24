@@ -8,11 +8,12 @@ import retrofit2.http.Query;
 import retrofit2.http.Url;
 
 public interface PokeApi {
-    // Busca a lista inicial de Pokémon
     @GET("pokemon")
     Call<PokemonResponse> getPokemonList(@Query("limit") int limit);
 
-    // Busca os detalhes principais de um Pokémon (sprites, stats...)
     @GET("pokemon/{idOrName}")
     Call<PokemonModel> getPokemonDetail(@Path("idOrName") String idOrName);
+
+    @GET("pokemon-species/{id}")
+    Call<PokemonSpecies> getPokemonSpecies(@Path("id") int id);
 }

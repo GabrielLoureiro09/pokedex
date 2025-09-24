@@ -21,8 +21,6 @@ public class PokemonModel {
     public int getWeight() { return weight; }
     public List<Stats> getStats() { return stats; }
 
-    // --- Classes Aninhadas ---
-
     public static class Types {
         @SerializedName("slot")
         private int slot;

@@ -14,7 +14,13 @@ import com.example.pokedex.R;
 import com.example.pokedex.data.api.PokeApi;
 import com.example.pokedex.data.api.PokeApiClient;
 import com.example.pokedex.data.model.PokemonModel;
+import com.example.pokedex.data.model.PokemonSpecies;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
+import java.util.Random;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -113,6 +119,41 @@ public class Detail extends AppCompatActivity {
             }
         }
 
+        fetchPokemonSpecies(detail.getId());
+    }
+
+    private void fetchPokemonSpecies(int pokemonId) {
+        pokeApi.getPokemonSpecies(pokemonId).enqueue(new Callback<PokemonSpecies>() {
+            @Override
+            public void onResponse(@NonNull Call<PokemonSpecies> call, @NonNull Response<PokemonSpecies> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    PokemonSpecies speciesData = response.body();
+
+                    // Filtra apenas entradas em inglês
+                    List<PokemonSpecies.FlavorTextEntry> englishEntries = new ArrayList<>();
+                    for (PokemonSpecies.FlavorTextEntry entry : speciesData.getFlavorTextEntries()) {
+                        if (entry.getLanguage() != null && "en".equals(entry.getLanguage().getName())) {
+                            englishEntries.add(entry);
+                        }
+                    }
+
+                    if (!englishEntries.isEmpty()) {
+                        Random random = new Random();
+                        int randomIndex = random.nextInt(englishEntries.size());
+
+                        String flavorText = englishEntries.get(randomIndex).getFlavorText();
+
+                        flavorText = flavorText.replace("\n", " ").replace("\f", " ");
+
+                        pokemonDescription.setText(" \"" + flavorText + "\" ");
+                    } else {
+                        pokemonDescription.setText("Descrição não disponível.");
+                    }
+                }
+            }
+            @Override
+            public void onFailure(@NonNull Call<PokemonSpecies> call, @NonNull Throwable t) {}
+        });
     }
 
     private int getTypeColor(String typeName) {
