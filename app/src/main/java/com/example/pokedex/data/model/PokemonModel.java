@@ -22,10 +22,7 @@ public class PokemonModel {
     public List<Stats> getStats() { return stats; }
 
     public static class Types {
-        @SerializedName("slot")
-        private int slot;
         private Type type;
-        public String getSlot(int slot) { return getType().getName(); }
         public Type getType() { return type; }
     }
 
@@ -56,13 +53,11 @@ public class PokemonModel {
             @SerializedName("front_default")
             private String frontDefault;
 
-            // Eu adiciono este campo para capturar a URL do sprite shiny.
             @SerializedName("front_shiny")
             private String frontShiny;
 
             public String getFrontDefault() { return frontDefault; }
 
-            // E este é o método getter que estava faltando.
             public String getFrontShiny() { return frontShiny; }
         }
 

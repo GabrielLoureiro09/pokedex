@@ -8,18 +8,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
+import com.example.pokedex.data.model.PokemonTypes;
 import com.example.pokedex.ui.Detail;
 import com.example.pokedex.data.model.PokemonModel;
 import com.example.pokedex.R;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -29,12 +28,8 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonViewHolder> {
-
-    public enum SortType {
-        ID_ASC, ID_DESC, NAME_ASC, NAME_DESC
-    }
-
     private final List<PokemonModel> pokemonDetailList = new ArrayList<>();
+    private final List<PokemonTypes> pokemonTypesList = new ArrayList<>();
     private final Context context;
     private final com.example.pokedex.data.api.PokeApi pokeApiService;
 
@@ -45,18 +40,6 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         pokeApiService = retrofit.create(com.example.pokedex.data.api.PokeApi.class);
-    }
-
-    public void sortList(SortType sortType) {
-        Comparator<PokemonModel> comparator;
-        switch (sortType) {
-            case ID_DESC: comparator = Comparator.comparingInt(PokemonModel::getId).reversed(); break;
-            case NAME_ASC: comparator = Comparator.comparing(PokemonModel::getName); break;
-            case NAME_DESC: comparator = Comparator.comparing(PokemonModel::getName).reversed(); break;
-            default: comparator = Comparator.comparingInt(PokemonModel::getId); break;
-        }
-        pokemonDetailList.sort(comparator);
-        notifyDataSetChanged();
     }
 
     public void submitList(List<PokemonModel> newPokemonDetails) {
@@ -99,13 +82,11 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
         List<PokemonModel.Types> types = detail.getTypes();
 
         if (!types.isEmpty()) {
-            // Tipo 1
             String type1Name = types.get(0).getType().getName();
             Glide.with(context).load(getTypeUrl(type1Name)).into(holder.type1);
             holder.cardView.setCardBackgroundColor(Color.parseColor(
                     TYPE_COLORS.getOrDefault(type1Name, "#FFFFFF")));
 
-            // Tipo 2
             if (types.size() > 1) {
                 String type2Name = types.get(1).getType().getName();
                 Glide.with(context).load(getTypeUrl(type2Name)).into(holder.type2);
@@ -122,20 +103,6 @@ public class PokemonAdapter extends RecyclerView.Adapter<PokemonAdapter.PokemonV
             intent.putExtra("POKEMON_ID", detail.getId());
             context.startActivity(intent);
         });
-    }
-
-    private ImageView createTypeImageView(String typeName) {
-        ImageView imageView = new ImageView(context);
-        String resourceName = typeName.toLowerCase(Locale.ROOT) + "_type";
-
-        int resourceId = context.getResources().getIdentifier(resourceName, "drawable", context.getPackageName());
-        if (resourceId != 0) {
-            imageView.setImageResource(resourceId);
-        }
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(dpToPx(70), dpToPx(30));
-        params.setMarginEnd(dpToPx(8));
-        imageView.setLayoutParams(params);
-        return imageView;
     }
 
     @Override

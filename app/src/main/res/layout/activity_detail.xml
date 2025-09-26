@@ -95,7 +95,7 @@
         android:layout_marginStart="51dp"
         android:layout_marginTop="823dp"
         android:fontFamily="@font/jersey20"
-        android:text="Weekness"
+        android:text="Weakness"
         android:textColor="@color/black"
         android:textSize="24dp"
         app:layout_constraintStart_toStartOf="parent"
@@ -250,7 +250,7 @@
         tools:srcCompat="@mipmap/weight_icon" />
 
     <ImageView
-        android:id="@+id/imageView3"
+        android:id="@+id/weakness"
         android:layout_width="65dp"
         android:layout_height="24dp"
         android:layout_marginStart="150dp"
@@ -260,7 +260,7 @@
         tools:srcCompat="@tools:sample/avatars" />
 
     <ImageView
-        android:id="@+id/imageView5"
+        android:id="@+id/weakness2"
         android:layout_width="65dp"
         android:layout_height="24dp"
         android:layout_marginStart="220dp"
@@ -270,7 +270,7 @@
         tools:srcCompat="@tools:sample/avatars" />
 
     <ImageView
-        android:id="@+id/imageView6"
+        android:id="@+id/weakness3"
         android:layout_width="65dp"
         android:layout_height="24dp"
         android:layout_marginStart="290dp"
@@ -280,7 +280,7 @@
         tools:srcCompat="@tools:sample/avatars" />
 
     <ImageView
-        android:id="@+id/imageView7"
+        android:id="@+id/weakness4"
         android:layout_width="65dp"
         android:layout_height="24dp"
         android:layout_marginStart="185dp"
@@ -290,7 +290,7 @@
         tools:srcCompat="@tools:sample/avatars" />
 
     <ImageView
-        android:id="@+id/imageView8"
+        android:id="@+id/weakness5"
         android:layout_width="65dp"
         android:layout_height="24dp"
         android:layout_marginStart="255dp"
@@ -308,4 +308,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:srcCompat="@mipmap/weekness_icon" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
