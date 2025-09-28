@@ -19,4 +19,7 @@ public interface PokeApi {
 
     @GET("type/{name}")
     Call<PokemonTypes> getPokemonTypes(@Path("name") String name);
+
+    @GET("move/{name}")
+    Call<PokemonMoves> getPokemonMove(@Path("name") String name);
 }

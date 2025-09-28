@@ -1,5 +1,6 @@
 package com.example.pokedex.ui;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -15,12 +16,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.pokedex.R;
+import com.example.pokedex.adapter.MoveAdapter;
 import com.example.pokedex.data.api.PokeApi;
 import com.example.pokedex.data.api.PokeApiClient;
 import com.example.pokedex.data.model.PokemonModel;
+import com.example.pokedex.data.model.PokemonMoves;
 import com.example.pokedex.data.model.PokemonSpecies;
 import com.example.pokedex.data.model.PokemonTypes;
 
@@ -40,10 +46,11 @@ public class Detail extends AppCompatActivity {
     private ImageView pokemonSprite, pokemonWeakness1, pokemonWeakness2, pokemonWeakness3, pokemonWeakness4, pokemonWeakness5;
     private TextView pokemonNumber, pokemonName, pokemonHeight_en, pokemonWeight_en, pokemonHeight_pt, pokemonWeight_pt, pokemonDescription, type, tvValueHp, tvValueAtk, tvValueDef, tvValueSpAtk, tvValueSpDef, tvValueSpeed;
     private PokeApi pokeApi;
-    private ConstraintLayout background, cl_about, cl_status, cl_moves;
+    private ConstraintLayout background, cl_about, cl_status;
     private ProgressBar pbHp, pbAtk, pbDef, pbSpAtk, pbSpDef, pbSpeed;
     private int currentPokemonId;
     private String normalSpriteUrl;
+    private RecyclerView rv_moves;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,7 +90,7 @@ public class Detail extends AppCompatActivity {
         bt_moves = findViewById(R.id.bt_right);
         cl_about = findViewById(R.id.cl_about);
         cl_status = findViewById(R.id.cl_status);
-        cl_moves = findViewById(R.id.cl_moves);
+        rv_moves = findViewById(R.id.moveRecyclerView);
         pbHp = findViewById(R.id.pb_hp);
         pbAtk = findViewById(R.id.pb_atk);
         pbDef = findViewById(R.id.pb_def);
@@ -190,7 +197,7 @@ public class Detail extends AppCompatActivity {
             bt_about.setOnClickListener(v -> {
                 cl_about.setVisibility(View.VISIBLE);
                 cl_status.setVisibility(View.GONE);
-                cl_moves.setVisibility(View.GONE);
+                rv_moves.setVisibility(View.GONE);
 
                 Drawable bgAbout = ContextCompat.getDrawable(this, R.drawable.tab_left).mutate();
                 Drawable bgStatus = ContextCompat.getDrawable(this, R.drawable.tab_middle).mutate();
@@ -207,7 +214,7 @@ public class Detail extends AppCompatActivity {
             bt_status.setOnClickListener(v -> {
                 cl_about.setVisibility(View.GONE);
                 cl_status.setVisibility(View.VISIBLE);
-                cl_moves.setVisibility(View.GONE);
+                rv_moves.setVisibility(View.GONE);
 
                 Drawable bgAbout = ContextCompat.getDrawable(this, R.drawable.tab_left).mutate();
                 Drawable bgStatus = ContextCompat.getDrawable(this, R.drawable.tab_middle).mutate();
@@ -224,7 +231,7 @@ public class Detail extends AppCompatActivity {
             bt_moves.setOnClickListener(v -> {
                 cl_about.setVisibility(View.GONE);
                 cl_status.setVisibility(View.GONE);
-                cl_moves.setVisibility(View.VISIBLE);
+                rv_moves.setVisibility(View.VISIBLE);
 
                 Drawable bgAbout = ContextCompat.getDrawable(this, R.drawable.tab_left).mutate();
                 Drawable bgStatus = ContextCompat.getDrawable(this, R.drawable.tab_middle).mutate();
@@ -249,6 +256,7 @@ public class Detail extends AppCompatActivity {
                 populateIndividualStats(statName, value);
             }
         }
+        fetchPokemonMoves(detail.getMoves());
     }
 
     private void populateIndividualStats(String statName, int value) {
@@ -355,6 +363,50 @@ public class Detail extends AppCompatActivity {
             }
         });
     }
+
+    private void fetchPokemonMoves(List<PokemonModel.Moves> movesList) {
+        if (movesList == null || movesList.isEmpty()) return;
+
+        List<PokemonMoves> pokemonMoves = new ArrayList<>();
+        final int[] count = {0};
+
+        for (PokemonModel.Moves m : movesList) {
+            String url = m.getMove().getUrl();
+            String moveId = url.replace("https://pokeapi.co/api/v2/move/", "").replace("/", "");
+            pokeApi.getPokemonMove(moveId).enqueue(new Callback<PokemonMoves>() {
+                @Override
+                public void onResponse(@NonNull Call<PokemonMoves> call, @NonNull Response<PokemonMoves> response) {
+                    count[0]++;
+                    if (response.isSuccessful() && response.body() != null) {
+                        pokemonMoves.add(response.body());
+                    }
+                    if (count[0] == movesList.size()) {
+                        setupMovesRecyclerView(pokemonMoves);
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<PokemonMoves> call, @NonNull Throwable t) {
+                    count[0]++;
+                    if (count[0] == movesList.size()) {
+                        setupMovesRecyclerView(pokemonMoves);
+                    }
+                }
+            });
+        }
+    }
+
+    private void setupMovesRecyclerView(List<PokemonMoves> moves) {
+        MoveAdapter adapter = new MoveAdapter(moves);
+        RecyclerView recyclerView = findViewById(R.id.moveRecyclerView);
+
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
+        recyclerView.setLayoutManager(gridLayoutManager);
+
+        recyclerView.setAdapter(adapter);
+    }
+
+
 
     private String getTypeUrl(String typeName) {
         return "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/types/generation-v/black-white/"

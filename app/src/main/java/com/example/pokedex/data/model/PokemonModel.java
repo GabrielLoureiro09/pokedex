@@ -12,6 +12,7 @@ public class PokemonModel {
     private int height;
     private int weight;
     private List<Stats> stats;
+    private List<Moves> moves;
 
     public int getId() { return id; }
     public String getName() { return name; }
@@ -20,6 +21,7 @@ public class PokemonModel {
     public int getHeight() { return height; }
     public int getWeight() { return weight; }
     public List<Stats> getStats() { return stats; }
+    public List<Moves> getMoves() { return moves; }
 
     public static class Types {
         private Type type;
@@ -102,5 +104,19 @@ public class PokemonModel {
     public static class Stat {
         private String name;
         public String getName() { return name; }
+    }
+
+    public static class Moves {
+        @SerializedName("move")
+        private Move move;
+        public Move getMove() { return move; }
+
+        public static class Move {
+            private String name;
+            private String url;
+
+            public String getName() { return name; }
+            public String getUrl() { return url; }
+        }
     }
 }
