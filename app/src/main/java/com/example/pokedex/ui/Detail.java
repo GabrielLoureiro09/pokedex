@@ -1,16 +1,21 @@
 package com.example.pokedex.ui;
 
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
+
 import com.bumptech.glide.Glide;
 import com.example.pokedex.R;
 import com.example.pokedex.data.api.PokeApi;
@@ -31,12 +36,13 @@ import retrofit2.Retrofit;
 
 public class Detail extends AppCompatActivity {
 
+    private Button bt_about, bt_status, bt_moves;
     private ImageView pokemonSprite, pokemonWeakness1, pokemonWeakness2, pokemonWeakness3, pokemonWeakness4, pokemonWeakness5;
-    private TextView pokemonNumber, pokemonName, pokemonHeight_en, pokemonWeight_en, pokemonHeight_pt, pokemonWeight_pt, pokemonDescription, type;
+    private TextView pokemonNumber, pokemonName, pokemonHeight_en, pokemonWeight_en, pokemonHeight_pt, pokemonWeight_pt, pokemonDescription, type, tvValueHp, tvValueAtk, tvValueDef, tvValueSpAtk, tvValueSpDef, tvValueSpeed;
     private PokeApi pokeApi;
-    private ConstraintLayout background;
+    private ConstraintLayout background, cl_about, cl_status, cl_moves;
+    private ProgressBar pbHp, pbAtk, pbDef, pbSpAtk, pbSpDef, pbSpeed;
     private int currentPokemonId;
-
     private String normalSpriteUrl;
 
     @Override
@@ -72,6 +78,24 @@ public class Detail extends AppCompatActivity {
         pokemonWeakness4 = findViewById(R.id.weakness4);
         pokemonWeakness5 = findViewById(R.id.weakness5);
         background = findViewById(R.id.main);
+        bt_about = findViewById(R.id.bt_left);
+        bt_status = findViewById(R.id.bt_middle);
+        bt_moves = findViewById(R.id.bt_right);
+        cl_about = findViewById(R.id.cl_about);
+        cl_status = findViewById(R.id.cl_status);
+        cl_moves = findViewById(R.id.cl_moves);
+        pbHp = findViewById(R.id.pb_hp);
+        pbAtk = findViewById(R.id.pb_atk);
+        pbDef = findViewById(R.id.pb_def);
+        pbSpAtk = findViewById(R.id.pb_satk);
+        pbSpDef = findViewById(R.id.pb_sdef);
+        pbSpeed = findViewById(R.id.pb_spd);
+        tvValueHp = findViewById(R.id.tv_hp);
+        tvValueAtk = findViewById(R.id.tv_atk);
+        tvValueDef = findViewById(R.id.tv_def);
+        tvValueSpAtk = findViewById(R.id.tv_satk);
+        tvValueSpDef = findViewById(R.id.tv_sdef);
+        tvValueSpeed = findViewById(R.id.tv_spd);
     }
 
     private void setupRetrofitServices() {
@@ -116,7 +140,7 @@ public class Detail extends AppCompatActivity {
         if (normalSpriteUrl != null) {
             Glide.with(this).load(normalSpriteUrl).into(pokemonSprite);
         } else {
-            pokemonSprite.setImageResource(R.drawable.ic_search_resized);
+            pokemonSprite.setImageResource(R.drawable.weekness_icon);
         }
 
         if (detail.getTypes() != null && !detail.getTypes().isEmpty()) {
@@ -127,9 +151,9 @@ public class Detail extends AppCompatActivity {
 
             int secondaryColor = Color.argb(
                     200,
-                    Math.min(255, (Color.red(primaryColor) - 170)),
-                    Math.min(255, (Color.green(primaryColor) - 170)),
-                    Math.min(255, (Color.blue(primaryColor) - 170))
+                    Math.min(255, Math.max(0, Color.red(primaryColor) + 50)),
+                    Math.min(255, Math.max(0, Color.green(primaryColor) + 50)),
+                    Math.min(255, Math.max(0, Color.blue(primaryColor) + 50))
             );
 
             GradientDrawable gradientDrawable = new GradientDrawable(
@@ -141,16 +165,121 @@ public class Detail extends AppCompatActivity {
             background.setBackground(gradientDrawable);
 
             GradientDrawable bg = (GradientDrawable) ContextCompat.getDrawable(this, R.drawable.type_background);
+
             if (bg != null) {
                 type.setBackground(bg);
                 bg.setColor(primaryColor);
             }
-        }
 
+            int[] drawables = { R.drawable.tab_left, R.drawable.tab_middle, R.drawable.tab_right };
+            Button[] buttons = { bt_about, bt_status, bt_moves };
+
+            for (int i = 0; i < buttons.length; i++) {
+                Drawable backgroundBt = ContextCompat.getDrawable(this, drawables[i]);
+                if (backgroundBt != null) {
+                    backgroundBt = backgroundBt.mutate();
+                    if (i == 0) {
+                        DrawableCompat.setTint(backgroundBt, primaryColor);
+                        buttons[i].setBackground(backgroundBt);
+                    } else {
+                        DrawableCompat.setTint(backgroundBt, secondaryColor);
+                        buttons[i].setBackground(backgroundBt);
+                    }
+                }
+            }
+            bt_about.setOnClickListener(v -> {
+                cl_about.setVisibility(View.VISIBLE);
+                cl_status.setVisibility(View.GONE);
+                cl_moves.setVisibility(View.GONE);
+
+                Drawable bgAbout = ContextCompat.getDrawable(this, R.drawable.tab_left).mutate();
+                Drawable bgStatus = ContextCompat.getDrawable(this, R.drawable.tab_middle).mutate();
+                Drawable bgMoves = ContextCompat.getDrawable(this, R.drawable.tab_right).mutate();
+
+                DrawableCompat.setTint(bgAbout, primaryColor);
+                DrawableCompat.setTint(bgStatus, secondaryColor);
+                DrawableCompat.setTint(bgMoves, secondaryColor);
+
+                bt_about.setBackground(bgAbout);
+                bt_status.setBackground(bgStatus);
+                bt_moves.setBackground(bgMoves);
+            });
+            bt_status.setOnClickListener(v -> {
+                cl_about.setVisibility(View.GONE);
+                cl_status.setVisibility(View.VISIBLE);
+                cl_moves.setVisibility(View.GONE);
+
+                Drawable bgAbout = ContextCompat.getDrawable(this, R.drawable.tab_left).mutate();
+                Drawable bgStatus = ContextCompat.getDrawable(this, R.drawable.tab_middle).mutate();
+                Drawable bgMoves = ContextCompat.getDrawable(this, R.drawable.tab_right).mutate();
+
+                DrawableCompat.setTint(bgAbout, secondaryColor);
+                DrawableCompat.setTint(bgStatus, primaryColor);
+                DrawableCompat.setTint(bgMoves, secondaryColor);
+
+                bt_about.setBackground(bgAbout);
+                bt_status.setBackground(bgStatus);
+                bt_moves.setBackground(bgMoves);
+            });
+            bt_moves.setOnClickListener(v -> {
+                cl_about.setVisibility(View.GONE);
+                cl_status.setVisibility(View.GONE);
+                cl_moves.setVisibility(View.VISIBLE);
+
+                Drawable bgAbout = ContextCompat.getDrawable(this, R.drawable.tab_left).mutate();
+                Drawable bgStatus = ContextCompat.getDrawable(this, R.drawable.tab_middle).mutate();
+                Drawable bgMoves = ContextCompat.getDrawable(this, R.drawable.tab_right).mutate();
+
+                DrawableCompat.setTint(bgAbout, secondaryColor);
+                DrawableCompat.setTint(bgStatus, secondaryColor);
+                DrawableCompat.setTint(bgMoves, primaryColor);
+
+                bt_about.setBackground(bgAbout);
+                bt_status.setBackground(bgStatus);
+                bt_moves.setBackground(bgMoves);
+            });
+        }
 
         fetchPokemonSpecies(detail.getId());
         fetchPokemonWeaknesses(detail.getTypes().get(0).getType().getName());
+        if (detail.getStats() != null) {
+            for (PokemonModel.Stats stat : detail.getStats()) {
+                String statName = stat.getStat().getName();
+                int value = stat.getBaseStat();
+                populateIndividualStats(statName, value);
+            }
+        }
     }
+
+    private void populateIndividualStats(String statName, int value) {
+        switch (statName) {
+            case "hp":
+                pbHp.setProgress(value);
+                tvValueHp.setText(String.valueOf(value));
+                break;
+            case "attack":
+                pbAtk.setProgress(value);
+                tvValueAtk.setText(String.valueOf(value));
+                break;
+            case "defense":
+                pbDef.setProgress(value);
+                tvValueDef.setText(String.valueOf(value));
+                break;
+            case "special-attack":
+                pbSpAtk.setProgress(value);
+                tvValueSpAtk.setText(String.valueOf(value));
+                break;
+            case "special-defense":
+                pbSpDef.setProgress(value);
+                tvValueSpDef.setText(String.valueOf(value));
+                break;
+            case "speed":
+                pbSpeed.setProgress(value);
+                tvValueSpeed.setText(String.valueOf(value));
+                break;
+        }
+    }
+
 
     private void fetchPokemonSpecies(int pokemonId) {
         pokeApi.getPokemonSpecies(pokemonId).enqueue(new Callback<PokemonSpecies>() {
@@ -200,7 +329,6 @@ public class Detail extends AppCompatActivity {
                         List<PokemonTypes.TypeRelation> weaknesses =
                                 typeData.getDamageRelations().getDoubleDamageFrom();
 
-                        // limpa os slots
                         pokemonWeakness1.setImageDrawable(null);
                         pokemonWeakness2.setImageDrawable(null);
                         pokemonWeakness3.setImageDrawable(null);

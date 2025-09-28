@@ -5,6 +5,8 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/cardview_dark_background"
+    android:backgroundTint="@color/cardview_dark_background"
     tools:context=".ui.Pokedex">
 
     <ImageView
@@ -25,7 +27,7 @@
         android:layout_marginTop="90dp"
         android:fontFamily="@font/jersey20"
         android:text="Pokedex"
-        android:textColor="#000000"
+        android:textColor="@color/white"
         android:textSize="48dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -42,8 +44,8 @@
         android:inputType="text"
         android:paddingStart="20dp"
         android:singleLine="true"
-        android:textColor="@color/white"
-        android:textColorHint="@color/white"
+        android:textColor="@color/black"
+        android:textColorHint="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -63,6 +65,16 @@
         app:layout_constraintTop_toBottomOf="@+id/search_input"
         app:layout_constraintVertical_bias="0.0"
         tools:listitem="@layout/item_pokemon_card" />
+
+    <ImageView
+        android:id="@+id/loading_gif"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:srcCompat="@tools:sample/avatars" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -3,12 +3,17 @@ package com.example.pokedex.ui;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
 import com.example.pokedex.R;
 import com.example.pokedex.adapter.PokemonAdapter;
 import com.example.pokedex.data.api.PokeApi;
@@ -31,6 +36,7 @@ public class Pokedex extends AppCompatActivity {
     private PokemonAdapter pokemonAdapter;
     private EditText searchInput;
     private PokeApi pokeApiService;
+    private ImageView loadingGif;
 
     private final List<PokemonModel> initialPokemonDetails = new ArrayList<>();
     private int detailsFetchedCounter = 0;
@@ -42,6 +48,9 @@ public class Pokedex extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.pokemonRecyclerView);
         searchInput = findViewById(R.id.search_input);
+        loadingGif = findViewById(R.id.loading_gif);
+
+        Glide.with(this).asGif().load(R.mipmap.simple_pokeball_loading).into(loadingGif);
 
         setupRetrofit();
         pokemonAdapter = new PokemonAdapter(this);
@@ -129,6 +138,10 @@ public class Pokedex extends AppCompatActivity {
     private void onAllInitialDetailsFetched() {
         initialPokemonDetails.sort(Comparator.comparingInt(PokemonModel::getId));
         pokemonAdapter.submitList(new ArrayList<>(initialPokemonDetails));
+
+        loadingGif.setVisibility(View.GONE);
+
+        recyclerView.setVisibility(View.VISIBLE);
     }
 
     private void filterLocalList(String query) {
