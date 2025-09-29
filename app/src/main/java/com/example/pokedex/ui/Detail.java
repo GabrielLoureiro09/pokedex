@@ -1,6 +1,7 @@
 package com.example.pokedex.ui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -29,6 +30,7 @@ import com.example.pokedex.data.model.PokemonModel;
 import com.example.pokedex.data.model.PokemonMoves;
 import com.example.pokedex.data.model.PokemonSpecies;
 import com.example.pokedex.data.model.PokemonTypes;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +53,7 @@ public class Detail extends AppCompatActivity {
     private int currentPokemonId;
     private String normalSpriteUrl;
     private RecyclerView rv_moves;
+    private FloatingActionButton evolutionButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +62,16 @@ public class Detail extends AppCompatActivity {
 
         initializeViews();
         setupRetrofitServices();
+
+        evolutionButton.setOnClickListener(v -> {
+            if (currentPokemonId != -1) {
+                Intent intent = new Intent(Detail.this, EvolutionChain.class);
+                intent.putExtra("POKEMON_ID", currentPokemonId);
+                startActivity(intent);
+            } else {
+                Toast.makeText(Detail.this, "ID do Pokémon não disponível", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         currentPokemonId = getIntent().getIntExtra("POKEMON_ID", -1);
         if (currentPokemonId != -1) {
@@ -103,6 +116,7 @@ public class Detail extends AppCompatActivity {
         tvValueSpAtk = findViewById(R.id.tv_satk);
         tvValueSpDef = findViewById(R.id.tv_sdef);
         tvValueSpeed = findViewById(R.id.tv_spd);
+        evolutionButton = findViewById(R.id.evolutionButton);
     }
 
     private void setupRetrofitServices() {

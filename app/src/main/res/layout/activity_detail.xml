@@ -8,6 +8,18 @@
     android:background="@color/cardview_dark_background"
     tools:context=".ui.Detail">
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/evolutionButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="30dp"
+        android:layout_marginBottom="30dp"
+        android:clickable="true"
+        app:backgroundTint="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@mipmap/pokemon_evolution_icon" />
+
     <ImageView
         android:id="@+id/pokeball_icon"
         android:layout_width="23dp"

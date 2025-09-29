@@ -22,4 +22,7 @@ public interface PokeApi {
 
     @GET("move/{name}")
     Call<PokemonMoves> getPokemonMove(@Path("name") String name);
+
+    @GET("evolution-chain/{id}")
+    Call<PokemonEvolutions> getPokemonEvolutionChain(@Path("id") int id);
 }
